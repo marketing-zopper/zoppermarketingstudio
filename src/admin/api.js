@@ -26,7 +26,6 @@ async function request(method, url, body) {
 }
 
 export const api = {
-  login: (password) => request("POST", "/api/auth/login", { password }),
   logout: () => request("POST", "/api/auth/logout"),
   overview: () => request("GET", "/api/admin/overview"),
   employees: () => request("GET", "/api/admin/employees"),

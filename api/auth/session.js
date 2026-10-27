@@ -1,4 +1,3 @@
-import { getSession } from "../_lib/auth.js";
 import { resolveUser } from "../_lib/access.js";
 import { route, send } from "../_lib/http.js";
 
@@ -11,6 +10,5 @@ export default route({ methods: ["GET"], access: "public" }, async (req, res) =>
     status: "ok",
     email: user.email,
     isAdmin: user.isAdmin,
-    adminSession: user.isAdmin && !!getSession(req),
   });
 });

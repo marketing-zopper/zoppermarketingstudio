@@ -1,4 +1,3 @@
-import { getSession } from "./auth.js";
 import { resolveUser } from "./access.js";
 import { StoreUnavailable } from "./store.js";
 
@@ -20,7 +19,7 @@ export function redirect(res, location, cookies = []) {
 // access:
 //   "public" — no checks (handler does its own)
 //   "user"   — Google-verified AND approved in Redis (fresh lookup)
-//   "admin"  — "user" + exactly the admin email + admin password session
+//   "admin"  — "user" + exactly the administrator email (verified via Google)
 export function route({ methods, access = "admin" }, handler) {
   return async (req, res) => {
     try {
@@ -42,7 +41,6 @@ export function route({ methods, access = "admin" }, handler) {
         if (user.state === "denied") return send(res, 403, { error: "Access not allowed.", code: "denied" });
         if (access === "admin") {
           if (!user.isAdmin) return send(res, 403, { error: "Access not allowed.", code: "forbidden" });
-          if (!getSession(req)) return send(res, 401, { error: "Admin sign-in required.", code: "admin_login_required" });
         }
         ctx = user;
       }

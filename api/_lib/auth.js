@@ -1,6 +1,5 @@
 // Server-side authentication primitives.
 //  - zms_user  : Google-verified employee session (signed, httpOnly)
-//  - zms_admin : admin password session, layered on top of zms_user (signed, httpOnly)
 //  - zms_oauth : short-lived state for the Google OAuth round trip
 import crypto from "node:crypto";
 
@@ -8,10 +7,8 @@ export const ADMIN_EMAIL = "marketingext@zopper.com";
 export const ALLOWED_DOMAIN = "zopper.com";
 
 const USER_COOKIE = "zms_user";
-const ADMIN_COOKIE = "zms_admin";
 const OAUTH_COOKIE = "zms_oauth";
 const USER_SESSION_SECONDS = 60 * 60 * 24 * 7; // 7 days; approval is re-checked on every request
-const ADMIN_SESSION_SECONDS = 60 * 60 * 8; // 8 hours
 const OAUTH_SECONDS = 60 * 10;
 
 const b64u = (buf) => Buffer.from(buf).toString("base64url");
@@ -55,18 +52,6 @@ function cookieString(name, value, maxAge, sameSite) {
   return `${name}=${value}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAge}${secure}`;
 }
 
-// ---------- admin password ----------
-// Hash format: scrypt:<saltB64>:<hashB64>  (generate with `npm run hash-password`)
-export function verifyPassword(password) {
-  const stored = process.env.ADMIN_PASSWORD_HASH;
-  if (!stored) throw new Error("ADMIN_PASSWORD_HASH is not set.");
-  const [scheme, saltB64, hashB64] = stored.split(":");
-  if (scheme !== "scrypt" || !saltB64 || !hashB64) throw new Error("ADMIN_PASSWORD_HASH is malformed.");
-  const expected = Buffer.from(hashB64, "base64");
-  const actual = crypto.scryptSync(String(password), Buffer.from(saltB64, "base64"), expected.length);
-  return crypto.timingSafeEqual(actual, expected);
-}
-
 // ---------- user session (Google) ----------
 // Lax (not Strict): the cookie is set on the redirect back from Google.
 export const createUserCookie = (email) =>
@@ -77,16 +62,6 @@ export function getUserSession(req) {
   const data = unpack(readCookie(req, USER_COOKIE));
   const email = typeof data?.email === "string" ? data.email.toLowerCase() : "";
   return email.endsWith(`@${ALLOWED_DOMAIN}`) ? { email } : null;
-}
-
-// ---------- admin session (password) ----------
-export const createSessionCookie = (email) =>
-  cookieString(ADMIN_COOKIE, pack({ email }, ADMIN_SESSION_SECONDS), ADMIN_SESSION_SECONDS, "Strict");
-export const clearSessionCookie = () => cookieString(ADMIN_COOKIE, "", 0, "Strict");
-
-export function getSession(req) {
-  const data = unpack(readCookie(req, ADMIN_COOKIE));
-  return data?.email === ADMIN_EMAIL ? { email: data.email } : null;
 }
 
 // ---------- OAuth round-trip state ----------

@@ -1,7 +1,7 @@
 # Setup & deployment
 
 How sign-in works: **Google login → approval check in Redis → Master Dashboard.**
-An `@zopper.com` Google account is *not* enough on its own — the employee must be added (and active) in the Admin Portal. The administrator email `marketingext@zopper.com` is always approved and additionally needs the admin password to open the Admin Portal.
+An `@zopper.com` Google account is *not* enough on its own — the employee must be added (and active) in the Admin Portal. The administrator email `marketingext@zopper.com` is always approved and goes straight into the Admin Portal after Google sign-in (no separate password).
 
 ## Environment variables
 Set these in **Vercel → Project → Settings → Environment Variables** (and in `.env.local` for local development — see `.env.example`).
@@ -10,7 +10,7 @@ Set these in **Vercel → Project → Settings → Environment Variables** (and 
 |---|---|
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client (see below) |
 | `APP_URL` *(optional)* | Pins the public URL used for the OAuth redirect, e.g. `https://zoppermarketingstudio.vercel.app` |
-| `ADMIN_PASSWORD_HASH`, `SESSION_SECRET` | From `npm run hash-password -- "<admin password>"` (only the hash is stored) |
+| `SESSION_SECRET` | Random string of 32+ characters that signs login sessions |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis → REST API section (`KV_REST_API_URL` / `KV_REST_API_TOKEN` also accepted) |
 
 Redeploy after changing environment variables.
