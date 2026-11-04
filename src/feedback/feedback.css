@@ -60,7 +60,7 @@
 .fb-scene {
   position: relative;
   height: calc(var(--u) * 293);
-  background: url("/feedback/scene.webp") top left / calc(var(--u) * 390.7) auto no-repeat;
+  background: url("/feedback/scene-v2.webp") top left / calc(var(--u) * 390.7) auto no-repeat;
 }
 .fb-scene img { position: absolute; display: block; height: auto; user-select: none; -webkit-user-drag: none; }
 .fb-scene__croma { left: calc(var(--u) * 157.5); top: calc(var(--u) * 34); width: calc(var(--u) * 73); }
