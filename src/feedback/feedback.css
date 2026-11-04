@@ -388,6 +388,8 @@
 }
 .fb-rate__screen-hint { font-size: calc(var(--u) * 7.5); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.75; }
 .fb-rate__screen-label { font-size: calc(var(--u) * 17); font-weight: 700; line-height: 1.05; }
+.fb-rate__screen--0 { padding: 0 calc(var(--u) * 10); }
+.fb-rate__screen--0 .fb-rate__screen-label { font-size: calc(var(--u) * 13.5); }
 .fb-rate__screen--1 .fb-rate__screen-label { color: #ff7a59; text-shadow: 0 0 calc(var(--u) * 6) rgba(255, 122, 89, 0.55); }
 .fb-rate__screen--2 .fb-rate__screen-label { color: #ffb347; text-shadow: 0 0 calc(var(--u) * 6) rgba(255, 179, 71, 0.55); }
 .fb-rate__screen--3 .fb-rate__screen-label { color: #ffe94d; text-shadow: 0 0 calc(var(--u) * 6) rgba(255, 233, 77, 0.5); }

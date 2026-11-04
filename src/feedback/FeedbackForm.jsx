@@ -165,7 +165,7 @@ export default function FeedbackForm() {
           </header>
 
           <section className="fb-scene" aria-hidden="false">
-            <img className="fb-scene__croma" src={`${A}/croma-header.png`} alt="" aria-hidden="true" />
+            <img className="fb-scene__croma" src={`${A}/croma-navy.png`} alt="" aria-hidden="true" />
             <img className="fb-scene__person" src={`${A}/character.webp`} alt="" width="420" height="615" />
             <p className="fb-bubble" aria-hidden="true">How can we<br />support your<br />store better?</p>
             <img className="fb-scene__desk" src={`${A}/desk-sign.webp`} alt="" width="900" height="269" />
@@ -202,7 +202,7 @@ export default function FeedbackForm() {
                 </div>
 
                 <div className="fb-field" data-field="storeId-wrap">
-                  <label className="fb-label" id="fb-store-label" htmlFor="fb-store">Store name</label>
+                  <label className="fb-label" id="fb-store-label" htmlFor="fb-store">Croma Store</label>
                   <div onBlur={() => blur("storeId")}>
                     <StoreSelect
                       inputId="fb-store"
@@ -220,7 +220,7 @@ export default function FeedbackForm() {
                 </div>
 
                 <div className="fb-field">
-                  <label className="fb-label" htmlFor="fb-phone">Phone number</label>
+                  <label className="fb-label" htmlFor="fb-phone">Contact Number</label>
                   <div className={`fb-phone${err.phone ? " is-invalid" : ""}`}>
                     <span className="fb-phone__prefix" aria-hidden="true">+91</span>
                     <input
@@ -244,7 +244,7 @@ export default function FeedbackForm() {
                 </div>
 
                 <div className="fb-field">
-                  <label className="fb-label" htmlFor="fb-feedback">Personal feedback</label>
+                  <label className="fb-label" htmlFor="fb-feedback">Your feedback to Zopper&apos;s Senior Management</label>
                   <textarea
                     id="fb-feedback"
                     data-field="feedback"
@@ -283,14 +283,18 @@ export default function FeedbackForm() {
                 <img className="fb-plant fb-plant--r" src={`${A}/plant.webp`} alt="" aria-hidden="true" />
 
                 <fieldset className={`fb-rate${err.rating ? " is-invalid" : ""}${values.rating ? " has-value" : ""}`}>
-                  <legend className="fb-sr">How has your experience with Zopper been? Choose one rating from 1 to 5.</legend>
+                  <legend className="fb-sr">Rate your experience with Zopper. Choose one rating from 1 to 5.</legend>
                   <img className="fb-rate__img" src={`${A}/rating-panel.webp`} alt="" width="1000" height="530" />
-                  {values.rating > 0 && (
-                    <div className={`fb-rate__screen fb-rate__screen--${values.rating}`} aria-hidden="true">
-                      <span className="fb-rate__screen-hint">You picked</span>
-                      <span className="fb-rate__screen-label">{RATING_LABELS[values.rating]}</span>
-                    </div>
-                  )}
+                  <div className={`fb-rate__screen fb-rate__screen--${values.rating}`} aria-hidden="true">
+                    {values.rating > 0 ? (
+                      <>
+                        <span className="fb-rate__screen-hint">You picked</span>
+                        <span className="fb-rate__screen-label">{RATING_LABELS[values.rating]}</span>
+                      </>
+                    ) : (
+                      <span className="fb-rate__screen-label">Rate your experience with Zopper</span>
+                    )}
+                  </div>
                   {FACES.map((f) => (
                     <label
                       key={f.v}
@@ -327,7 +331,7 @@ export default function FeedbackForm() {
                     </>
                   ) : (
                     <>
-                      Submit feedback <span aria-hidden="true">→</span>
+                      Share Feedback <span aria-hidden="true">→</span>
                     </>
                   )}
                 </button>
