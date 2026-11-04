@@ -35,7 +35,7 @@ export default function Landing() {
       <h1 className="hero__title">Zopper Marketing Studio</h1>
       <p className="hero__sub">One workspace. All your internal tools.</p>
 
-      <section className="grid">
+      <section className="grid grid--home">
         <Card
           to="/employee"
           icon={ICONS.employee}
@@ -52,6 +52,14 @@ export default function Landing() {
           title="Admin Portal"
           description="Manage employee access and tool permissions."
           cta="Open Admin Portal"
+        />
+        <Card
+          to="/feedbackform"
+          icon={ICONS.feedback}
+          accent="var(--dark-blue)"
+          title="QR Feedback Dashboard"
+          description="Collect store feedback from Croma teams through a simple QR form."
+          cta="Open Feedback Form"
         />
       </section>
 

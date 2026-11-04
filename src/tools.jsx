@@ -41,6 +41,15 @@ export const ICONS = {
       <path d="M18 14.4A6 6 0 0 1 21 20" />
     </svg>
   ),
+  // QR code
+  feedback: (
+    <svg {...svgProps}>
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" />
+    </svg>
+  ),
   admin: (
     <svg {...svgProps}>
       <path d="M12 3 4.5 6v5.5c0 4.5 3.1 8.1 7.5 9.5 4.4-1.4 7.5-5 7.5-9.5V6Z" />
