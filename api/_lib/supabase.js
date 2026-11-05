@@ -1,12 +1,12 @@
 // Minimal Supabase (PostgREST) client for the QR feedback form.
 // Server-only: uses the secret / service-role key, which must never reach the browser.
-// Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel -> Project -> Environment Variables.
+// Set FORM_SUPABASE_URL and FORM_SUPABASE_SERVICE_ROLE_KEY in Vercel -> Project -> Environment Variables.
 
 export class FeedbackUnavailable extends Error {}
 
 function config() {
-  const url = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = (process.env.FORM_SUPABASE_URL || "").replace(/\/+$/, "");
+  const key = process.env.FORM_SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new FeedbackUnavailable("Feedback storage is not configured.");
   return { url, key };
 }

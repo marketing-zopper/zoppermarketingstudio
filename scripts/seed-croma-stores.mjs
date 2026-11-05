@@ -3,7 +3,7 @@
 //   node scripts/seed-croma-stores.mjs                      upsert every store (safe to re-run)
 //   node scripts/seed-croma-stores.mjs --deactivate-missing also mark stores NOT in the file as inactive
 //
-// Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from the environment or .env.local).
+// Needs FORM_SUPABASE_URL and FORM_SUPABASE_SERVICE_ROLE_KEY (read from the environment or .env.local).
 // Feedback rows are never touched.
 import fs from "node:fs";
 import path from "node:path";
@@ -16,10 +16,10 @@ try {
   }
 } catch {}
 
-const URL_ = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
-const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const URL_ = (process.env.FORM_SUPABASE_URL || "").replace(/\/+$/, "");
+const KEY = process.env.FORM_SUPABASE_SERVICE_ROLE_KEY;
 if (!URL_ || !KEY) {
-  console.error("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or .env.local).");
+  console.error("Set FORM_SUPABASE_URL and FORM_SUPABASE_SERVICE_ROLE_KEY (environment or .env.local).");
   process.exit(1);
 }
 const headers = {

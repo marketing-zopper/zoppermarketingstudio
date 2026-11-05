@@ -7,8 +7,8 @@ Set in **Vercel → Project → Settings → Environment Variables** (and `.env.
 
 | Variable | Purpose |
 |---|---|
-| `SUPABASE_URL` | Project URL, e.g. `https://<project-ref>.supabase.co` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API Keys → **Secret key** (`sb_secret_…`; the legacy `service_role` key also works). **Server-only — never put it in client code.** |
+| `FORM_SUPABASE_URL` | Project URL, e.g. `https://<project-ref>.supabase.co` |
+| `FORM_SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API Keys → **Secret key** (`sb_secret_…`; the legacy `service_role` key also works). **Server-only — never put it in client code.** |
 | `FEEDBACK_IP_SALT` *(optional)* | Salt for the IP hash used by rate limiting (falls back to `SESSION_SECRET`) |
 
 The browser never talks to Supabase (the publishable/anon key is not used anywhere), so nothing sensitive reaches the client.

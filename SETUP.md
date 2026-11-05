@@ -32,4 +32,4 @@ Add an entry to `shared/toolsMeta.js` and an icon to `src/tools.jsx`. It appears
 Tool access is checked on the server **when a card is clicked** (fresh Redis lookup, identity from the signed session). The tools are separate deployments with their own logins, so this does **not** stop someone who already knows a tool's direct URL from opening it. That needs integration inside each tool in a later phase.
 
 ## QR Feedback Form (/feedbackform)
-Public page for Croma store staff (no Google login), stored in Supabase. Setup, env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) and store-import steps are in [supabase/README.md](supabase/README.md).
+Public page for Croma store staff (no Google login), stored in Supabase. Setup, env vars (FORM_SUPABASE_URL, FORM_SUPABASE_SERVICE_ROLE_KEY) and store-import steps are in [supabase/README.md](supabase/README.md).
