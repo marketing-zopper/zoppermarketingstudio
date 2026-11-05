@@ -141,8 +141,9 @@ button.card:disabled { cursor: progress; opacity: 0.8; }
 .card__arrow { transition: transform 0.2s ease; }
 a.card:hover .card__arrow, button.card:hover .card__arrow { transform: translateX(4px); }
 
-.grid--home { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.grid--tools { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid--tools { grid-template-columns: repeat(2, 1fr); } /* four tools: 4 across, 2x2, or stacked */
+@media (min-width: 1180px) { .grid--tools { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 640px) { .grid--tools { grid-template-columns: 1fr; } }
 
 .card--disabled { opacity: 0.55; --accent: #8a94ad; }
 

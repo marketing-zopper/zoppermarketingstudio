@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StoreSelect from "./StoreSelect.jsx";
+import DeskCharacter from "./DeskCharacter.jsx";
 import { LIMITS, RATING_LABELS, cleanPhone, validateFeedback } from "../../shared/feedbackRules.js";
 import "./feedback.css";
 
@@ -55,6 +56,7 @@ export default function FeedbackForm() {
   const keyRef = useRef(newKey());
   const inFlight = useRef(false);
   const formRef = useRef(null);
+  const charRef = useRef(null);
 
   // page-only font + title; restored when leaving
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function FeedbackForm() {
     document.title = "Croma × Zopper · Feedback Desk";
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pixelify+Sans:wght@500;700&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Jersey+10&display=swap";
     document.head.appendChild(link);
     return () => {
       document.title = prev;
@@ -166,7 +168,7 @@ export default function FeedbackForm() {
 
           <section className="fb-scene" aria-hidden="false">
             <img className="fb-scene__croma" src={`${A}/croma-navy.png`} alt="" aria-hidden="true" />
-            <img className="fb-scene__person" src={`${A}/character.webp`} alt="" width="420" height="615" />
+            <DeskCharacter ref={charRef} />
             <p className="fb-bubble" aria-hidden="true">How can we<br />support your<br />store better?</p>
             <img className="fb-scene__desk" src={`${A}/desk-sign.webp`} alt="" width="900" height="269" />
             <span className="fb-scene__patch" aria-hidden="true" />
@@ -306,6 +308,7 @@ export default function FeedbackForm() {
                         name="rating"
                         value={f.v}
                         checked={values.rating === f.v}
+                        onClick={() => charRef.current?.nod()}
                         onChange={() => {
                           set("rating", f.v);
                           blur("rating");

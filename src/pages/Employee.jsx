@@ -3,7 +3,7 @@ import Layout from "../components/Layout.jsx";
 import Card from "../components/Card.jsx";
 import AccessModal from "../components/AccessModal.jsx";
 import { api } from "../admin/api.js";
-import { TOOLS } from "../tools.jsx";
+import { ICONS, TOOLS } from "../tools.jsx";
 
 export default function Employee() {
   const [checking, setChecking] = useState(null); // tool id being checked
@@ -52,6 +52,16 @@ export default function Employee() {
             cta="Open tool"
           />
         ))}
+        {/* public page (no login needed) — opens the existing /feedbackform in place */}
+        <Card
+          to="/feedbackform"
+          replace
+          icon={ICONS.feedback}
+          accent="var(--dark-blue)"
+          title="Croma Feedback Form"
+          description="Collect store feedback from Croma teams through a simple QR form."
+          cta="Open tool"
+        />
       </section>
 
       {modal && <AccessModal {...modal} onClose={() => setModal(null)} />}
