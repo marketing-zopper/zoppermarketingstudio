@@ -34,4 +34,4 @@ Tool access is checked on the server **when a card is clicked** (fresh Redis loo
 ## Croma Feedback Form (separate app)
 The Croma × Zopper QR feedback form is **not part of this app any more**. It is its own deployment at https://cromafeedbackform.vercel.app/ (own repo, own Supabase backend and environment variables). The Employee Dashboard card "Croma Feedback Form" opens it in a new tab.
 
-Old QR codes that point at `/feedbackform` on this site keep working: `vercel.json` sends that exact path to the standalone form with a temporary (307) redirect. Nothing else in this repo, and no environment variable of this app, relates to the form.
+The old `/feedbackform` path on this site no longer leads to the form (it is treated like any unknown route: signed-out visitors land on the login page). Nothing else in this repo, and no environment variable of this app, relates to the form.

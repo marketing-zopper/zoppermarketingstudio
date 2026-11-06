@@ -1,11 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/feedbackform",
-      "destination": "https://cromafeedbackform.vercel.app/",
-      "statusCode": 307
-    }
-  ],
   "rewrites": [
     {
       "source": "/((?!api/).*)",
