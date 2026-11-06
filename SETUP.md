@@ -31,5 +31,7 @@ Add an entry to `shared/toolsMeta.js` and an icon to `src/tools.jsx`. It appears
 ## What is and isn't enforced
 Tool access is checked on the server **when a card is clicked** (fresh Redis lookup, identity from the signed session). The tools are separate deployments with their own logins, so this does **not** stop someone who already knows a tool's direct URL from opening it. That needs integration inside each tool in a later phase.
 
-## QR Feedback Form (/feedbackform)
-Public page for Croma store staff (no Google login), stored in Supabase. Setup, env vars (FORM_SUPABASE_URL, FORM_SUPABASE_SERVICE_ROLE_KEY) and store-import steps are in [supabase/README.md](supabase/README.md).
+## Croma Feedback Form (separate app)
+The Croma × Zopper QR feedback form is **not part of this app any more**. It is its own deployment at https://cromafeedbackform.vercel.app/ (own repo, own Supabase backend and environment variables). The Employee Dashboard card "Croma Feedback Form" opens it in a new tab.
+
+Old QR codes that point at `/feedbackform` on this site keep working: `vercel.json` sends that exact path to the standalone form with a temporary (307) redirect. Nothing else in this repo, and no environment variable of this app, relates to the form.

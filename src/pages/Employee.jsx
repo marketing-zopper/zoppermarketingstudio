@@ -52,10 +52,9 @@ export default function Employee() {
             cta="Open tool"
           />
         ))}
-        {/* public page (no login needed) — opens the existing /feedbackform in place */}
+        {/* standalone public app (its own deployment, no login needed) — opens in a new tab */}
         <Card
-          to="/feedbackform"
-          replace
+          href="https://cromafeedbackform.vercel.app/"
           icon={ICONS.feedback}
           accent="var(--dark-blue)"
           title="Croma Feedback Form"
