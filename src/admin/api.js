@@ -31,8 +31,15 @@ export const api = {
   employees: () => request("GET", "/api/admin/employees"),
   addEmployee: (email, name) => request("POST", "/api/admin/employees", { email, name }),
   updateEmployee: (email, changes) => request("PATCH", "/api/admin/employee", { email, ...changes }),
+  updateSettings: (settings) => request("PATCH", "/api/admin/employees", { settings }),
   toolAccess: (toolId) => request("POST", "/api/tools/access", { toolId }),
   logs: () => request("GET", "/api/admin/logs"),
+  // Croma Feedback Dashboard (every call is role-checked on the server)
+  feedbackItems: (params) => request("GET", `/api/feedback-dashboard/items?${new URLSearchParams(params)}`),
+  feedbackItem: (id) => request("GET", `/api/feedback-dashboard/item?id=${encodeURIComponent(id)}`),
+  feedbackComment: (id, body) => request("POST", "/api/feedback-dashboard/item", { id, body }),
+  feedbackDeleteComment: (commentId) => request("DELETE", `/api/feedback-dashboard/item?commentId=${encodeURIComponent(commentId)}`),
+  feedbackArchive: (id, archived) => request("PATCH", "/api/feedback-dashboard/item", { id, archived }),
 };
 
 // Session check: 200 ok, 401 signed out and 403 denied are all normal answers (not errors).

@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import { api } from "./api.js";
 import { useToast } from "./Toast.jsx";
 
+// "Tool title" for on/off tools, "Tool title (Role)" for role-based tools; nothing when there is no access.
+function accessList(tools, emp) {
+  return tools.flatMap((t) => {
+    if (!t.roleBased) return emp.permissions[t.id] ? [t.title] : [];
+    const role = emp.toolRoles?.[t.id] || "none";
+    return role === "none" ? [] : [`${t.title} (${t.roles.find((r) => r.id === role)?.label || role})`];
+  });
+}
+
 function EditModal({ employee, tools, onClose, onSaved }) {
   const toast = useToast();
   const [name, setName] = useState(employee.name || "");
@@ -23,7 +32,7 @@ function EditModal({ employee, tools, onClose, onSaved }) {
     }
   }
 
-  const allowed = tools.filter((t) => employee.permissions[t.id]);
+  const allowed = accessList(tools, employee);
 
   return (
     <div className="modal" role="dialog" aria-modal="true" onClick={onClose}>
@@ -45,7 +54,7 @@ function EditModal({ employee, tools, onClose, onSaved }) {
           <div className="field">
             <span>Tool access</span>
             <p className="muted">
-              {allowed.length ? allowed.map((t) => t.title).join(", ") : "No tools allowed"} — manage in the Tool Access tab.
+              {allowed.length ? allowed.join(", ") : "No tools allowed"} — manage in the Tool Access tab.
             </p>
           </div>
 
@@ -180,10 +189,10 @@ export default function Employees({ data, onChange }) {
                     </td>
                     <td>
                       <div className="chips">
-                        {data.tools.filter((t) => emp.permissions[t.id]).map((t) => (
-                          <span key={t.id} className="chip">{t.title}</span>
+                        {accessList(data.tools, emp).map((label) => (
+                          <span key={label} className="chip">{label}</span>
                         ))}
-                        {!data.tools.some((t) => emp.permissions[t.id]) && <span className="muted">None</span>}
+                        {accessList(data.tools, emp).length === 0 && <span className="muted">None</span>}
                       </div>
                     </td>
                     <td className="right">

@@ -46,6 +46,11 @@ export default function Portal({ email }) {
     setVersion((v) => v + 1);
   };
 
+  const replaceSettings = (settings) => {
+    setData((d) => ({ ...d, settings }));
+    setVersion((v) => v + 1);
+  };
+
   return (
     <div className="portal">
       <div className="portal__head">
@@ -84,7 +89,7 @@ export default function Portal({ email }) {
         ) : tab === "employees" ? (
           <Employees data={data} onChange={replaceEmployee} />
         ) : (
-          <Access data={data} onChange={replaceEmployee} />
+          <Access data={data} onChange={replaceEmployee} onSettings={replaceSettings} />
         ))}
     </div>
   );

@@ -25,4 +25,19 @@ export const TOOLS_META = [
     url: "https://zopper-service-triage.vercel.app",
     accent: "dark-blue",
   },
+  // Built into this app. Access is a per-employee ROLE (employee.toolRoles[id]) instead of an on/off switch.
+  {
+    id: "croma-feedback-dashboard",
+    title: "Croma Feedback Dashboard",
+    description: "Review Croma store feedback, add internal comments and manage submissions.",
+    url: "/croma-feedback-dashboard",
+    accent: "dark-blue",
+    roleBased: true,
+    roles: [
+      { id: "none", label: "No Access" },
+      { id: "viewer", label: "Viewer" },
+      { id: "editor", label: "Editor" }, // reserved; selectable only after the Global Super Admin enables it
+      { id: "admin", label: "Admin" },
+    ],
+  },
 ];

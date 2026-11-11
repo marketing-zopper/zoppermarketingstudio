@@ -12,6 +12,7 @@ const REDIS_TOKEN = () => process.env.KV_REST_API_TOKEN || process.env.UPSTASH_R
 
 const EMP_KEY = "zms:employees"; // hash: email -> JSON
 const LOG_KEY = "zms:logs"; // list, newest first
+const SETTINGS_KEY = "zms:settings"; // JSON: { [toolId]: { editorEnabled: boolean } }
 const MAX_LOGS = 1000;
 
 export class StoreUnavailable extends Error {}
@@ -76,6 +77,25 @@ export async function saveEmployee(emp) {
   }
   const db = readFile();
   db.employees[emp.email] = emp;
+  writeFile(db);
+}
+
+// Global tool settings (written only by the Global Super Admin through the Admin Portal).
+export async function getSettings() {
+  if (mode() === "redis") {
+    const raw = await redis(["GET", SETTINGS_KEY]);
+    return raw ? JSON.parse(raw) : {};
+  }
+  return readFile().settings || {};
+}
+
+export async function saveSettings(settings) {
+  if (mode() === "redis") {
+    await redis(["SET", SETTINGS_KEY, JSON.stringify(settings)]);
+    return;
+  }
+  const db = readFile();
+  db.settings = settings;
   writeFile(db);
 }
 

@@ -50,6 +50,14 @@ export const ICONS = {
       <path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" />
     </svg>
   ),
+  // feedback inbox with a chart
+  "croma-feedback-dashboard": (
+    <svg {...svgProps}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M3 14h5l1.5 2.5h5L16 14h5" />
+      <path d="M8 9v2M12 7v4M16 10v1" />
+    </svg>
+  ),
   admin: (
     <svg {...svgProps}>
       <path d="M12 3 4.5 6v5.5c0 4.5 3.1 8.1 7.5 9.5 4.4-1.4 7.5-5 7.5-9.5V6Z" />

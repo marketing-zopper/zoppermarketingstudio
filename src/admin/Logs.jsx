@@ -9,6 +9,8 @@ const LABELS = {
   employee_reactivated: ["Reactivated", "ok"],
   permission_granted: ["Allowed", "ok"],
   permission_revoked: ["Revoked", "warn"],
+  role_changed: ["Role", "info"],
+  setting_changed: ["Setting", "info"],
 };
 
 export default function Logs({ version }) {
