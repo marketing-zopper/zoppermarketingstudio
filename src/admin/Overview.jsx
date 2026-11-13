@@ -47,7 +47,7 @@ export default function Overview({ version }) {
           <ul className="feed">
             {data.recentPermissionChanges.map((l) => (
               <li key={l.id}>
-                <span className={`dot dot--${l.type === "permission_granted" ? "ok" : "warn"}`} />
+                <span className={`dot dot--${l.type === "permission_revoked" || l.to === "no_access" ? "warn" : "ok"}`} />
                 <span className="feed__main">
                   <strong>{l.target}</strong> — {l.detail}
                 </span>

@@ -1,37 +1,22 @@
 // Role resolution + enforcement for the Croma Feedback Dashboard.
 // The role always comes from a FRESH Upstash read (via the route guard) — never from the browser.
+// It uses the standard roles (shared/rbac.js); what each may do is defined in shared/toolsMeta.js:
 //
-//   super_admin  marketingext@zopper.com only (not assignable): everything, incl. enabling Editor in the Admin Portal
+//   super_admin  marketingext@zopper.com only (not assignable): everything
 //   admin        view + comment + archive/restore + the Archived tab
-//   editor       reserved: while enabled it has Viewer capabilities only; while disabled it has no access
+//   editor       disabled by default; while enabled it has Viewer capabilities only; while disabled: no access
 //   viewer       view, search, filter, sort, comment
-//   none         default for every unassigned employee: no access
-import { ADMIN_EMAIL } from "./auth.js";
-import { getSettings } from "./store.js";
+//   no_access    default for every unassigned employee: no access
+import { resolveToolRole } from "./access.js";
 import { route, send } from "./http.js";
 import { FeedbackUnavailable } from "./supabase.js";
+import { can as canDo } from "../../shared/rbac.js";
 
 export const FEEDBACK_TOOL_ID = "croma-feedback-dashboard";
 
-const CAPS = {
-  none: [],
-  viewer: ["view", "comment"],
-  editor: ["view", "comment"],
-  admin: ["view", "comment", "archive"],
-  super_admin: ["view", "comment", "archive"],
-};
+export const can = (role, cap) => canDo(FEEDBACK_TOOL_ID, role, cap);
 
-export const can = (role, cap) => CAPS[role]?.includes(cap) === true;
-
-export async function resolveFeedbackRole(user) {
-  if (user.email === ADMIN_EMAIL) return "super_admin";
-  const stored = user.employee?.toolRoles?.[FEEDBACK_TOOL_ID] || "none";
-  if (stored === "editor") {
-    const settings = await getSettings();
-    return settings[FEEDBACK_TOOL_ID]?.editorEnabled === true ? "editor" : "none";
-  }
-  return stored in CAPS && stored !== "super_admin" ? stored : "none";
-}
+export const resolveFeedbackRole = (user) => resolveToolRole(user, FEEDBACK_TOOL_ID);
 
 // cap: one capability for every method, or a map { GET: "view", POST: "comment", PATCH: "archive" }.
 // A method missing from the map is refused.

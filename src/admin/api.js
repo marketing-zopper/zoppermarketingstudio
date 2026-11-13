@@ -29,9 +29,11 @@ export const api = {
   logout: () => request("POST", "/api/auth/logout"),
   overview: () => request("GET", "/api/admin/overview"),
   employees: () => request("GET", "/api/admin/employees"),
-  addEmployee: (email, name) => request("POST", "/api/admin/employees", { email, name }),
+  // Profile + roles in one request: roles is { [toolId]: "no_access" | "viewer" | "editor" | "admin" }
+  addEmployee: (email, name, roles) => request("POST", "/api/admin/employees", { email, name, roles }),
   updateEmployee: (email, changes) => request("PATCH", "/api/admin/employee", { email, ...changes }),
-  updateSettings: (settings) => request("PATCH", "/api/admin/employees", { settings }),
+  // Super Admin only: { [toolId]: { viewerEnabled?: boolean, editorEnabled?: boolean } }
+  updateAvailability: (settings) => request("PATCH", "/api/admin/employees", { settings }),
   toolAccess: (toolId) => request("POST", "/api/tools/access", { toolId }),
   logs: () => request("GET", "/api/admin/logs"),
   // Croma Feedback Dashboard (every call is role-checked on the server)

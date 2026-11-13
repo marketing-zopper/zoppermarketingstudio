@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { api } from "./api.js";
 import Overview from "./Overview.jsx";
-import Employees from "./Employees.jsx";
-import Access from "./Access.jsx";
+import EmployeesAccess from "./EmployeesAccess.jsx";
 import Logs from "./Logs.jsx";
 
 const TABS = [
   { id: "overview", label: "Overview" },
-  { id: "employees", label: "Employees" },
-  { id: "access", label: "Tool Access" },
+  { id: "employees", label: "Employees and Access Control" },
   { id: "logs", label: "Activity Logs" },
 ];
 
 export default function Portal({ email }) {
   const [tab, setTab] = useState("overview");
-  const [data, setData] = useState({ employees: [], tools: [] });
+  const [data, setData] = useState({ employees: [], tools: [], roles: [], availability: {} });
   const [status, setStatus] = useState("loading"); // loading | ready | error
   const [error, setError] = useState("");
   // Bumped after any change so Overview / Logs refetch.
@@ -46,8 +44,8 @@ export default function Portal({ email }) {
     setVersion((v) => v + 1);
   };
 
-  const replaceSettings = (settings) => {
-    setData((d) => ({ ...d, settings }));
+  const replaceAvailability = (availability) => {
+    setData((d) => ({ ...d, availability }));
     setVersion((v) => v + 1);
   };
 
@@ -78,7 +76,7 @@ export default function Portal({ email }) {
       {tab === "overview" && <Overview version={version} />}
       {tab === "logs" && <Logs version={version} />}
 
-      {(tab === "employees" || tab === "access") &&
+      {tab === "employees" &&
         (status === "loading" ? (
           <p className="muted-center">Loading employees…</p>
         ) : status === "error" ? (
@@ -86,10 +84,8 @@ export default function Portal({ email }) {
             <p className="form-error">{error}</p>
             <button className="btn btn--ghost" onClick={load}>Retry</button>
           </div>
-        ) : tab === "employees" ? (
-          <Employees data={data} onChange={replaceEmployee} />
         ) : (
-          <Access data={data} onChange={replaceEmployee} onSettings={replaceSettings} />
+          <EmployeesAccess data={data} onChange={replaceEmployee} onAvailability={replaceAvailability} />
         ))}
     </div>
   );

@@ -57,7 +57,7 @@ export default function Employee() {
       <p className="hero__sub">Choose a tool to get started.</p>
 
       <section className="grid grid--tools">
-        {TOOLS.filter((t) => !t.roleBased).map(toolCard)}
+        {TOOLS.filter((t) => !t.internal).map(toolCard)}
         {/* standalone public app (its own deployment, no login needed) — opens in a new tab */}
         <Card
           href="https://cromafeedbackform.vercel.app/"
@@ -67,7 +67,7 @@ export default function Employee() {
           description="Collect store feedback from Croma teams through a simple QR form."
           cta="Open tool"
         />
-        {TOOLS.filter((t) => t.roleBased).map(toolCard)}
+        {TOOLS.filter((t) => t.internal).map(toolCard)}
       </section>
 
       {modal && <AccessModal {...modal} onClose={() => setModal(null)} />}

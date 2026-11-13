@@ -12,7 +12,8 @@ const REDIS_TOKEN = () => process.env.KV_REST_API_TOKEN || process.env.UPSTASH_R
 
 const EMP_KEY = "zms:employees"; // hash: email -> JSON
 const LOG_KEY = "zms:logs"; // list, newest first
-const SETTINGS_KEY = "zms:settings"; // JSON: { [toolId]: { editorEnabled: boolean } }
+const SETTINGS_KEY = "zms:settings"; // JSON: { [toolId]: { viewerEnabled?: boolean, editorEnabled?: boolean } }
+const BACKUP_PREFIX = "zms:backup:"; // JSON snapshots written by scripts/migrate-rbac.mjs
 const MAX_LOGS = 1000;
 
 export class StoreUnavailable extends Error {}
@@ -80,6 +81,18 @@ export async function saveEmployee(emp) {
   writeFile(db);
 }
 
+// Atomic create: returns false (and writes nothing) if the email already exists.
+export async function createEmployee(emp) {
+  if (mode() === "redis") {
+    return (await redis(["HSETNX", EMP_KEY, emp.email, JSON.stringify(emp)])) === 1;
+  }
+  const db = readFile();
+  if (db.employees[emp.email]) return false;
+  db.employees[emp.email] = emp;
+  writeFile(db);
+  return true;
+}
+
 // Global tool settings (written only by the Global Super Admin through the Admin Portal).
 export async function getSettings() {
   if (mode() === "redis") {
@@ -113,11 +126,47 @@ export async function addLog(entry) {
   return log;
 }
 
+// Several entries in one write (oldest first), so a change and its audit trail succeed or fail together.
+export async function addLogs(entries) {
+  if (!entries.length) return [];
+  const at = new Date().toISOString();
+  const logs = entries.map((e) => ({ id: crypto.randomUUID(), at, ...e }));
+  if (mode() === "redis") {
+    await redis(["LPUSH", LOG_KEY, ...logs.map((l) => JSON.stringify(l))]);
+    await redis(["LTRIM", LOG_KEY, 0, MAX_LOGS - 1]);
+    return logs;
+  }
+  const db = readFile();
+  for (const l of logs) db.logs.unshift(l);
+  db.logs = db.logs.slice(0, MAX_LOGS);
+  writeFile(db);
+  return logs;
+}
+
 export async function listLogs(limit = 200) {
   if (mode() === "redis") {
     return ((await redis(["LRANGE", LOG_KEY, 0, limit - 1])) || []).map((r) => JSON.parse(r));
   }
   return readFile().logs.slice(0, limit);
+}
+
+// Named JSON snapshots (migration backups). Never expire; written with NX so a backup is never overwritten.
+export async function writeBackup(name, data) {
+  if (mode() === "redis") {
+    await redis(["SET", BACKUP_PREFIX + name, JSON.stringify(data), "NX"]);
+    return;
+  }
+  const db = readFile();
+  db.backups = { ...(db.backups || {}), [name]: data };
+  writeFile(db);
+}
+
+export async function readBackup(name) {
+  if (mode() === "redis") {
+    const raw = await redis(["GET", BACKUP_PREFIX + name]);
+    return raw ? JSON.parse(raw) : null;
+  }
+  return readFile().backups?.[name] || null;
 }
 
 // Fixed-window counter used for login throttling.

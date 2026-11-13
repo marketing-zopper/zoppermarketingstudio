@@ -1,24 +1,17 @@
 import { route, readJson, send } from "../_lib/http.js";
-import { TOOLS_META } from "../../shared/toolsMeta.js";
-import { FEEDBACK_TOOL_ID, resolveFeedbackRole } from "../_lib/feedbackAccess.js";
+import { resolveToolRole } from "../_lib/access.js";
+import { NO_ACCESS, toolById } from "../../shared/rbac.js";
 
 // POST { toolId } -> { allowed, url? }
-// Identity comes from the server session; permissions come from a fresh Redis read
-// (done by the route guard). Any failure results in a denial/error, never an open.
+// Identity comes from the server session; the employee's role and the role-availability settings come from
+// fresh Redis reads. No Access, an unavailable (switched-off) role, an inactive or unregistered employee,
+// or any failure results in a denial/error — never an open.
 export default route({ methods: ["POST"], access: "user" }, async (req, res, user) => {
   const { toolId } = await readJson(req);
-  const tool = TOOLS_META.find((t) => t.id === toolId);
+  const tool = toolById(toolId);
   if (!tool) return send(res, 400, { error: "Unknown tool." });
 
-  // Role-based tools (built into this app): any role other than "none" opens the card.
-  // Each of that tool's own APIs then enforces what the role may do.
-  if (tool.roleBased) {
-    const role = tool.id === FEEDBACK_TOOL_ID ? await resolveFeedbackRole(user) : "none";
-    return send(res, 200, role === "none" ? { allowed: false } : { allowed: true, url: tool.url });
-  }
-
-  // Administrator without an employee record is allowed; a record is always honoured.
-  const allowed = user.employee ? user.employee.permissions[tool.id] === true : user.isAdmin;
-  if (!allowed) return send(res, 200, { allowed: false });
+  const role = await resolveToolRole(user, tool.id);
+  if (role === NO_ACCESS) return send(res, 200, { allowed: false });
   send(res, 200, { allowed: true, url: tool.url });
 });

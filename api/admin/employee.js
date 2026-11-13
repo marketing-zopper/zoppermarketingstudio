@@ -1,11 +1,11 @@
 import { route, readJson, send } from "../_lib/http.js";
-import { getEmployee, saveEmployee, addLog, getSettings } from "../_lib/store.js";
-import { normalize, TOOL_IDS, ROLE_TOOLS } from "../_lib/employees.js";
-import { TOOLS_META } from "../../shared/toolsMeta.js";
+import { getEmployee, saveEmployee, addLogs, getSettings } from "../_lib/store.js";
+import { normalize, toRecord, parseRolesInput, roleChangeLogs } from "../_lib/employees.js";
+import { ROLE_LABEL, toolById } from "../../shared/rbac.js";
 
-const toolTitle = (id) => TOOLS_META.find((t) => t.id === id)?.title || id;
-
-// PATCH { email, name?, active?, permissions?: { [toolId]: boolean }, toolRoles?: { [toolId]: roleId } }
+// PATCH { email, name?, active?, roles?: { [toolId]: "no_access" | "viewer" | "editor" | "admin" } }
+// Profile and roles are validated together and saved in ONE write of the employee record, so a request
+// either applies completely or not at all. Only the Global Super Admin reaches this route (route guard).
 export default route({ methods: ["PATCH"] }, async (req, res, session) => {
   const body = await readJson(req);
   const email = String(body.email || "").trim().toLowerCase();
@@ -14,7 +14,7 @@ export default route({ methods: ["PATCH"] }, async (req, res, session) => {
 
   const next = normalize(current);
   const logs = [];
-  const actor = session.email;
+  let changed = false;
 
   if (body.name !== undefined) {
     const name = String(body.name).trim().slice(0, 80);
@@ -36,46 +36,33 @@ export default route({ methods: ["PATCH"] }, async (req, res, session) => {
     }
   }
 
-  if (body.permissions !== undefined) {
-    const perms = body.permissions;
-    if (!perms || typeof perms !== "object") return send(res, 400, { error: "Invalid permissions." });
-    for (const [toolId, value] of Object.entries(perms)) {
-      if (!TOOL_IDS.includes(toolId) || typeof value !== "boolean") {
-        return send(res, 400, { error: `Invalid permission: ${toolId}` });
-      }
-      if (next.permissions[toolId] !== value) {
-        next.permissions[toolId] = value;
+  if (body.roles !== undefined) {
+    const parsed = parseRolesInput(body.roles, await getSettings(), next.roles);
+    if (parsed.error) return send(res, 400, { error: parsed.error });
+
+    const before = next.roles;
+    next.roles = { ...before, ...parsed.roles };
+    logs.push(...roleChangeLogs(before, next.roles));
+
+    // Submitting a tool's role confirms it: that clears a "needs review" flag left by the migration.
+    for (const toolId of Object.keys(parsed.roles)) {
+      if (!next.review[toolId]) continue;
+      if (before[toolId] === next.roles[toolId]) {
         logs.push({
-          type: value ? "permission_granted" : "permission_revoked",
-          detail: `${value ? "Allowed" : "Revoked"} access to ${toolTitle(toolId)}`,
+          type: "role_reviewed",
+          detail: `${toolById(toolId).title} role confirmed: ${ROLE_LABEL[next.roles[toolId]]}`,
+          to: next.roles[toolId],
         });
       }
+      delete next.review[toolId];
+      changed = true;
     }
   }
 
-  if (body.toolRoles !== undefined) {
-    const roles = body.toolRoles;
-    if (!roles || typeof roles !== "object" || Array.isArray(roles)) return send(res, 400, { error: "Invalid roles." });
-    for (const [toolId, roleId] of Object.entries(roles)) {
-      const tool = ROLE_TOOLS.find((t) => t.id === toolId);
-      const role = tool?.roles.find((r) => r.id === roleId);
-      if (!tool || !role) return send(res, 400, { error: `Invalid role: ${toolId}` });
-      const before = next.toolRoles[toolId];
-      if (before === roleId) continue;
-      // Editor is reserved: it can only be assigned while the Global Super Admin has enabled it.
-      if (roleId === "editor" && (await getSettings())[toolId]?.editorEnabled !== true) {
-        return send(res, 400, { error: "The Editor role is not enabled." });
-      }
-      next.toolRoles[toolId] = roleId;
-      const label = (id) => tool.roles.find((r) => r.id === id)?.label || id;
-      logs.push({ type: "role_changed", detail: `${tool.title} role: ${label(before)} → ${label(roleId)}` });
-    }
-  }
-
-  if (logs.length) {
+  if (logs.length || changed) {
     next.updatedAt = new Date().toISOString();
-    await saveEmployee(next);
-    for (const l of logs) await addLog({ ...l, actor, target: email });
+    await saveEmployee(toRecord(next));
+    await addLogs(logs.map((l) => ({ ...l, actor: session.email, target: email })));
   }
-  send(res, 200, { employee: next });
+  send(res, 200, { employee: normalize(toRecord(next)) });
 });

@@ -65,7 +65,6 @@
 }
 .search { max-width: 260px; }
 .form-error { color: #c2410c; font-size: 0.85rem; margin: 12px 0 0; }
-.add__row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px; align-items: end; margin-top: 16px; }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -82,7 +81,9 @@
 .btn--danger:hover:not(:disabled) { background: #fff5f0; border-color: var(--orange); }
 .btn--sm { padding: 6px 14px; font-size: 0.82rem; }
 .login__form .btn { width: 100%; }
-.add__btn { height: 42px; white-space: nowrap; }
+.panel__tools { display: flex; align-items: center; gap: 12px; }
+.panel__tools .search { width: 260px; flex: 0 1 260px; min-width: 0; }
+.panel__tools .btn { white-space: nowrap; flex: none; }
 
 /* ---------- tables ---------- */
 .table-wrap { overflow-x: auto; }
@@ -98,8 +99,9 @@
 .who { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
 .who span:not(.badge) { color: var(--muted); font-size: 0.8rem; }
 .who .badge { margin-top: 4px; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--light-blue) 12%, white); color: var(--dark-blue); }
+.table th.th--role { white-space: normal; line-height: 1.3; min-width: 120px; }
+.table td .badge--btn { display: block; margin: 6px auto 0; border: 0; cursor: pointer; font: inherit; font-size: 0.7rem; font-weight: 500; }
+.table td .badge--btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ---------- badges + feed ---------- */
 .badge { display: inline-block; font-size: 0.72rem; font-weight: 500; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
@@ -129,19 +131,26 @@
 .switch:focus-visible { outline: 3px solid color-mix(in srgb, var(--light-blue) 35%, transparent); outline-offset: 2px; }
 
 /* ---------- role-based tool access ---------- */
-.role-setting { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.role-setting__text { min-width: 0; }
-.role-setting .switch { flex: none; }
+.role-grid { border: 0; margin: 20px 0 0; padding: 0; min-width: 0; }
+.role-grid legend { padding: 0; font-size: 0.82rem; font-weight: 500; color: var(--muted); margin-bottom: 4px; }
+.role-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.role-row:last-child { border-bottom: 0; }
+.role-row label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 500; color: var(--text); }
 .role-select {
   font: inherit; font-size: 0.85rem; color: var(--text); padding: 7px 10px; border: 1px solid var(--line);
-  border-radius: 10px; background: #fff; cursor: pointer; max-width: 170px;
+  border-radius: 10px; background: #fff; cursor: pointer; min-width: 160px; max-width: 200px;
 }
+.avail { margin-top: 18px; }
+.avail__count { margin-top: 6px; font-size: 0.72rem; color: var(--muted); }
+.role-select--inline { min-width: 0; width: 100%; max-width: 150px; }
+.role-select--off { border-color: var(--orange); color: var(--muted); }
 .role-select:disabled { opacity: 0.5; cursor: not-allowed; }
 .role-select:focus-visible { outline: 3px solid color-mix(in srgb, var(--light-blue) 35%, transparent); outline-offset: 2px; }
 
 /* ---------- modal + toast ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(26, 34, 56, 0.35); }
 .modal__box { width: 100%; max-width: 440px; background: #fff; border-radius: 16px; padding: 28px; text-align: left; box-shadow: 0 20px 60px rgba(31, 64, 145, 0.2); }
+.modal__box--wide { max-width: 560px; max-height: calc(100vh - 40px); overflow-y: auto; }
 .modal__actions { display: flex; align-items: center; gap: 10px; margin-top: 24px; }
 
 .toasts { position: fixed; right: 20px; bottom: 20px; z-index: 60; display: flex; flex-direction: column; gap: 10px; }
@@ -149,8 +158,12 @@
 .toast--error { background: #b4431a; }
 
 @media (max-width: 720px) {
-  .add__row { grid-template-columns: 1fr; }
   .search { max-width: none; }
+  .panel__tools { width: 100%; }
+  .panel__tools .search { width: auto; flex: 1 1 auto; max-width: none; }
+  .role-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .role-select { max-width: none; width: 100%; }
+  .modal__actions { flex-wrap: wrap; }
   .panel { padding: 18px; }
   .feed li { flex-wrap: wrap; gap: 6px 12px; }
   .toasts { left: 20px; }
