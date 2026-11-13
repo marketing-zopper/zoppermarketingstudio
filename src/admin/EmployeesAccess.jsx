@@ -39,7 +39,6 @@ function EmployeeModal({ employee, data, onClose, onSaved }) {
   const toast = useToast();
   const adding = !employee;
   const initial = employee?.roles || Object.fromEntries(data.tools.map((t) => [t.id, NO_ACCESS]));
-  const flagged = Object.keys(employee?.review || {});
   const locked = !adding && !employee.active; // deactivated employees keep their access untouched
 
   const [email, setEmail] = useState("");
@@ -64,11 +63,11 @@ function EmployeeModal({ employee, data, onClose, onSaved }) {
         onSaved(created);
         toast(`Added ${created.email}`);
       } else {
-        // Only send roles that changed, plus roles flagged for review (saving them confirms them).
+        // Only send the roles that changed.
         const sent = locked
           ? {}
           : Object.fromEntries(
-              data.tools.filter((t) => roles[t.id] !== initial[t.id] || flagged.includes(t.id)).map((t) => [t.id, roles[t.id]])
+              data.tools.filter((t) => roles[t.id] !== initial[t.id]).map((t) => [t.id, roles[t.id]])
             );
         const { employee: updated } = await api.updateEmployee(employee.email, {
           name,
@@ -110,9 +109,6 @@ function EmployeeModal({ employee, data, onClose, onSaved }) {
               <div className="role-row" key={t.id}>
                 <label htmlFor={`role-${t.id}`}>
                   {t.title}
-                  {flagged.includes(t.id) && (
-                    <span className="badge badge--warn" title="Converted from the old Yes/No setting — please confirm">Review</span>
-                  )}
                 </label>
                 <RoleSelect id={`role-${t.id}`} tool={t} data={data} value={roles[t.id]} onChange={(r) => setRoles((s) => ({ ...s, [t.id]: r }))} />
               </div>
@@ -124,9 +120,7 @@ function EmployeeModal({ employee, data, onClose, onSaved }) {
               ? "This employee is inactive. Reactivate them to change their access."
               : adding
                 ? "Every tool starts at No Access."
-                : flagged.length
-                  ? "Roles marked Review were converted from the old Yes/No setting. Saving confirms them."
-                  : "Disabled roles are switched off in Role availability below."}
+                : "Disabled roles are switched off in Role availability below."}
           </p>
 
           {error && <p className="form-error" role="alert">{error}</p>}
@@ -237,7 +231,6 @@ export default function EmployeesAccess({ data, onChange, onAvailability }) {
   const rows = data.employees.filter((e) => !q || e.email.includes(q) || (e.name || "").toLowerCase().includes(q));
 
   // Changing a dropdown in the directory saves that one role right away (same endpoint and checks as the form).
-  // Picking the role again isn't possible, so a "Review" badge is confirmed with its own button.
   async function setRole(emp, tool, role) {
     const key = `${emp.email}:${tool.id}`;
     setPending((p) => ({ ...p, [key]: true }));
@@ -306,17 +299,6 @@ export default function EmployeesAccess({ data, onChange, onAvailability }) {
                               disabled={!emp.active || !!pending[`${emp.email}:${t.id}`]}
                               onChange={(r) => setRole(emp, t, r)}
                             />
-                            {emp.review?.[t.id] && emp.active && (
-                              <button
-                                type="button"
-                                className="badge badge--warn badge--btn"
-                                title="This role was converted from the old Yes/No setting. Click to confirm it as it is."
-                                disabled={!!pending[`${emp.email}:${t.id}`]}
-                                onClick={() => setRole(emp, t, role)}
-                              >
-                                Review · confirm
-                              </button>
-                            )}
                           </td>
                         );
                       })}

@@ -12,7 +12,7 @@ export default route({ methods: ["GET"] }, async (req, res) => {
     inactiveEmployees: employees.length - active,
     totalTools: TOOLS_META.length,
     recentPermissionChanges: logs
-      .filter((l) => ["permission_granted", "permission_revoked", "role_changed", "role_reviewed"].includes(l.type))
+      .filter((l) => ["permission_granted", "permission_revoked", "role_changed"].includes(l.type))
       .slice(0, 5),
   });
 });

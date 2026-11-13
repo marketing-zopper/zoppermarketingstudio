@@ -1,7 +1,6 @@
 import { route, readJson, send } from "../_lib/http.js";
 import { getEmployee, saveEmployee, addLogs, getSettings } from "../_lib/store.js";
 import { normalize, toRecord, parseRolesInput, roleChangeLogs } from "../_lib/employees.js";
-import { ROLE_LABEL, toolById } from "../../shared/rbac.js";
 
 // PATCH { email, name?, active?, roles?: { [toolId]: "no_access" | "viewer" | "editor" | "admin" } }
 // Profile and roles are validated together and saved in ONE write of the employee record, so a request
@@ -14,7 +13,6 @@ export default route({ methods: ["PATCH"] }, async (req, res, session) => {
 
   const next = normalize(current);
   const logs = [];
-  let changed = false;
 
   if (body.name !== undefined) {
     const name = String(body.name).trim().slice(0, 80);
@@ -43,23 +41,9 @@ export default route({ methods: ["PATCH"] }, async (req, res, session) => {
     const before = next.roles;
     next.roles = { ...before, ...parsed.roles };
     logs.push(...roleChangeLogs(before, next.roles));
-
-    // Submitting a tool's role confirms it: that clears a "needs review" flag left by the migration.
-    for (const toolId of Object.keys(parsed.roles)) {
-      if (!next.review[toolId]) continue;
-      if (before[toolId] === next.roles[toolId]) {
-        logs.push({
-          type: "role_reviewed",
-          detail: `${toolById(toolId).title} role confirmed: ${ROLE_LABEL[next.roles[toolId]]}`,
-          to: next.roles[toolId],
-        });
-      }
-      delete next.review[toolId];
-      changed = true;
-    }
   }
 
-  if (logs.length || changed) {
+  if (logs.length) {
     next.updatedAt = new Date().toISOString();
     await saveEmployee(toRecord(next));
     await addLogs(logs.map((l) => ({ ...l, actor: session.email, target: email })));

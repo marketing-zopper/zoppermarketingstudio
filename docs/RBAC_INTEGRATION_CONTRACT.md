@@ -76,15 +76,12 @@ and is enforced inside the Master App.)
     "service-triage": "no_access",
     "croma-feedback-dashboard": "admin"
   },
-  "review": { "design-request": "legacy_access" },
   "permissions": { "design-request": true, "printables-studio": true, "service-triage": false },
   "toolRoles": { "croma-feedback-dashboard": "admin" }
 }
 ```
 
 * `roles` is the **source of truth** — one entry per tool.
-* `review` is optional. It marks a role that came from the old Yes/No setting and hasn't been confirmed by an admin
-  yet (`legacy_access`, `invalid_role`, `conflict`). It does **not** change access; ignore it.
 * `permissions` / `toolRoles` are legacy mirrors the Master App keeps in sync so a code rollback is safe. Don't use
   them to grant access. (They are used in one place only: see rule 5 below.)
 * `active: false` means the employee is deactivated: deny everything.
@@ -191,4 +188,4 @@ the external-tool sessions.
 
 `node scripts/migrate-rbac.mjs` is a dry run; `--apply` takes a backup then converts only the records that need it;
 `--rollback <id>` restores the saved records. A legacy Yes becomes the *lowest* role available by default
-(Viewer; Editor for Design Request, where Viewer is off) and is flagged `review`. Nothing becomes Admin.
+(Viewer; Editor for Design Request, where Viewer is off) and Nothing becomes Admin.

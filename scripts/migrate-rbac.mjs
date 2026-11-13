@@ -5,10 +5,10 @@
 //   node scripts/migrate-rbac.mjs --rollback <id>  restores the employee records saved in backup <id>
 //
 // Safe by design:
-//   * additive — every field already on a record is kept; `roles`, `rbacVersion` (and `review`) are added
+//   * additive — every field already on a record is kept; `roles` and `rbacVersion` are added
 //   * legacy `permissions` / `toolRoles` stay on the record, kept in sync, so the previous build still works
 //   * idempotent — records that are already current are left alone
-//   * a Yes/No permission converts to the LOWEST role available by default and is flagged "Review"; nothing
+//   * a Yes/No permission converts to the LOWEST role available by default; nothing
 //     is ever raised to Admin
 //   * the app also reads un-migrated records correctly, so running this is not required for the app to work —
 //     it exists so every record carries `roles` for other tools reading Upstash
@@ -81,12 +81,9 @@ for (const p of plan) {
   console.log(`~ ${p.raw.email}${p.raw.active ? "" : "  [inactive]"}`);
   for (const t of TOOLS_META) {
     const before = t.internal ? `role: ${p.raw.toolRoles?.[t.id] ?? "(none)"}` : `permission: ${p.raw.permissions?.[t.id] === true ? "Yes" : "No"}`;
-    const flag = p.emp.review[t.id] ? `   <-- REVIEW (${p.emp.review[t.id]})` : "";
-    console.log(`    ${title(t.id).padEnd(26)} ${before.padEnd(22)} -> ${ROLE_LABEL[p.emp.roles[t.id]]}${flag}`);
+    console.log(`    ${title(t.id).padEnd(26)} ${before.padEnd(22)} -> ${ROLE_LABEL[p.emp.roles[t.id]]}`);
   }
 }
-const reviews = todo.reduce((n, p) => n + Object.keys(p.emp.review).length, 0);
-console.log(`\nRoles flagged for review: ${reviews}`);
 
 if (!flag("--apply")) {
   console.log("\nDRY RUN — nothing was written. Re-run with --apply to migrate.");
@@ -105,5 +102,5 @@ await store.writeBackup(backupId, snapshot); // also kept in Upstash (zms:backup
 console.log(`\nBackup written: ${backupId}  (Upstash key zms:backup:${backupId} and .data/backups/${backupId}.json)`);
 
 for (const p of todo) await store.saveEmployee(p.next);
-await store.addLogs([{ type: "rbac_migrated", actor: "migrate-rbac", target: "RBAC schema", detail: `Migrated ${todo.length} employee record(s) to roles schema; ${reviews} role(s) flagged for review. Backup: ${backupId}` }]);
+await store.addLogs([{ type: "rbac_migrated", actor: "migrate-rbac", target: "RBAC schema", detail: `Migrated ${todo.length} employee record(s) to roles schema. Backup: ${backupId}` }]);
 console.log(`Migrated ${todo.length} record(s). To undo: node scripts/migrate-rbac.mjs --rollback ${backupId}`);

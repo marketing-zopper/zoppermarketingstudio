@@ -10,7 +10,6 @@ const LABELS = {
   permission_granted: ["Allowed", "ok"],
   permission_revoked: ["Revoked", "warn"],
   role_changed: ["Role", "info"],
-  role_reviewed: ["Reviewed", "ok"],
   rbac_migrated: ["Migration", "info"],
   setting_changed: ["Setting", "info"],
 };

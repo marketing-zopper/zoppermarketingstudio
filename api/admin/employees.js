@@ -67,7 +67,7 @@ export default route({ methods: ["GET", "POST", "PATCH"] }, async (req, res, ses
   const roles = { ...none, ...parsed.roles };
 
   const now = new Date().toISOString();
-  const record = toRecord({ email, name, active: true, roles, review: {}, createdAt: now, updatedAt: now });
+  const record = toRecord({ email, name, active: true, roles, createdAt: now, updatedAt: now });
   if (!(await createEmployee(record))) {
     return send(res, 409, { error: "This employee already exists." });
   }
