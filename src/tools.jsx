@@ -50,6 +50,16 @@ export const ICONS = {
       <path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" />
     </svg>
   ),
+  // QR code inside a scan frame
+  "qr-studio": (
+    <svg {...svgProps}>
+      <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" />
+      <rect x="8" y="8" width="3" height="3" rx="0.5" />
+      <rect x="13" y="8" width="3" height="3" rx="0.5" />
+      <rect x="8" y="13" width="3" height="3" rx="0.5" />
+      <path d="M13 13h3v3M13 16h.01" />
+    </svg>
+  ),
   // feedback inbox with a chart
   "croma-feedback-dashboard": (
     <svg {...svgProps}>

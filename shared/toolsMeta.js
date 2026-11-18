@@ -50,4 +50,19 @@ export const TOOLS_META = [
       admin: ["view", "comment", "archive"],
     },
   },
+  // Separate deployment. Its roles are enforced inside QR Studio itself, which reads them from Upstash.
+  // `capabilities` is the approved permission matrix. Pause and Delete are two separate operations.
+  {
+    id: "qr-studio",
+    title: "Zopper QR Studio",
+    description: "Create and manage branded QR codes.",
+    url: "https://zopper-qr-studio.vercel.app",
+    accent: "orange",
+    defaults: { viewer: true, editor: true },
+    capabilities: {
+      viewer: ["view"],
+      editor: ["view", "create"],
+      admin: ["view", "create", "pause", "delete"],
+    },
+  },
 ];

@@ -6,6 +6,9 @@ import AccessModal from "../components/AccessModal.jsx";
 import { api } from "../admin/api.js";
 import { ICONS, TOOLS } from "../tools.jsx";
 
+// The public Croma Feedback Form card is not a registry tool; it sits right after this one.
+const FORM_AFTER = "service-triage";
+
 export default function Employee() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(null); // tool id being checked
@@ -57,17 +60,24 @@ export default function Employee() {
       <p className="hero__sub">Choose a tool to get started.</p>
 
       <section className="grid grid--tools">
-        {TOOLS.filter((t) => !t.internal).map(toolCard)}
-        {/* standalone public app (its own deployment, no login needed) — opens in a new tab */}
-        <Card
-          href="https://cromafeedbackform.vercel.app/"
-          icon={ICONS.feedback}
-          accent="var(--dark-blue)"
-          title="Croma Feedback Form"
-          description="Collect store feedback from Croma teams through a simple QR form."
-          cta="Open tool"
-        />
-        {TOOLS.filter((t) => t.internal).map(toolCard)}
+        {/* Registry order. Order: Design Request, Printables, Triage, Croma Feedback Form, Croma Dashboard, QR Studio, … */}
+        {TOOLS.flatMap((tool) =>
+          tool.id !== FORM_AFTER
+            ? [toolCard(tool)]
+            : [
+                toolCard(tool),
+                /* standalone public app (its own deployment, no login needed) — opens in a new tab */
+                <Card
+                  key="croma-feedback-form"
+                  href="https://cromafeedbackform.vercel.app/"
+                  icon={ICONS.feedback}
+                  accent="var(--dark-blue)"
+                  title="Croma Feedback Form"
+                  description="Collect store feedback from Croma teams through a simple QR form."
+                  cta="Open tool"
+                />,
+              ]
+        )}
       </section>
 
       {modal && <AccessModal {...modal} onClose={() => setModal(null)} />}

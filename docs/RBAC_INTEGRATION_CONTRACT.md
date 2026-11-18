@@ -27,6 +27,7 @@ Tool ids (the keys used inside `roles`):
 | Design Request Tool | `design-request` |
 | Zopper Printables Studio | `printables-studio` |
 | Customer Service Triage | `service-triage` |
+| Zopper QR Studio | `qr-studio` |
 | Croma Feedback Dashboard (built into the Master App) | `croma-feedback-dashboard` |
 
 Role values — the same four for every tool, lowest to highest:
@@ -44,6 +45,7 @@ are always available. Defaults until the Super Admin changes them:
 | `design-request` | on | **off** | on | on |
 | `printables-studio` | on | on | on | on |
 | `service-triage` | on | on | on | on |
+| `qr-studio` | on | on | on | on |
 | `croma-feedback-dashboard` | on | on | **off** | on |
 
 A role that is switched off stays on the employee's record but grants **no access** until it is switched back on.
@@ -74,9 +76,10 @@ and is enforced inside the Master App.)
     "design-request": "editor",
     "printables-studio": "viewer",
     "service-triage": "no_access",
-    "croma-feedback-dashboard": "admin"
+    "croma-feedback-dashboard": "admin",
+    "qr-studio": "editor"
   },
-  "permissions": { "design-request": true, "printables-studio": true, "service-triage": false },
+  "permissions": { "design-request": true, "printables-studio": true, "service-triage": false, "qr-studio": true },
   "toolRoles": { "croma-feedback-dashboard": "admin" }
 }
 ```
@@ -93,8 +96,8 @@ Other examples:
 
 ```json
 { "email": "new.hire@zopper.com", "name": "", "active": true, "rbacVersion": 2,
-  "roles": { "design-request": "no_access", "printables-studio": "no_access", "service-triage": "no_access", "croma-feedback-dashboard": "no_access" },
-  "permissions": { "design-request": false, "printables-studio": false, "service-triage": false },
+  "roles": { "design-request": "no_access", "printables-studio": "no_access", "service-triage": "no_access", "croma-feedback-dashboard": "no_access", "qr-studio": "no_access" },
+  "permissions": { "design-request": false, "printables-studio": false, "service-triage": false, "qr-studio": false },
   "toolRoles": { "croma-feedback-dashboard": "none" },
   "createdAt": "2026-11-13T06:00:00.000Z", "updatedAt": "2026-11-13T06:00:00.000Z" }
 ```
@@ -119,7 +122,7 @@ reading Redis, or any value you don't understand, is a denial.
 3. `rec = HGET zms:employees email`. No record → **deny**. `rec.active !== true` → **deny**.
 4. `rec.rbacVersion !== 2` or `rec.roles` is not an object → **deny**.
 5. `role = rec.roles[toolId]` (treat the old spelling `"none"` as `"no_access"`). If it isn't one of
-   `viewer | editor | admin` → **deny**. For the three external tools also require
+   `viewer | editor | admin` → **deny**. For every external tool (everything except `croma-feedback-dashboard`) also require
    `rec.permissions[toolId] === true`, otherwise **deny** (an older Master build revoked it — believe the lower value).
 6. Role availability: `admin` is always available. For `viewer` / `editor`, read `zms:settings`:
    `settings[toolId][role + "Enabled"]` if it is a boolean, else the default from section 2.
@@ -133,6 +136,7 @@ const DEFAULTS = {
   "design-request":           { viewer: false, editor: true },
   "printables-studio":        { viewer: true,  editor: true },
   "service-triage":           { viewer: true,  editor: true },
+  "qr-studio":                { viewer: true,  editor: true },
   "croma-feedback-dashboard": { viewer: true,  editor: false },
 };
 

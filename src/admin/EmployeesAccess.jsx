@@ -289,7 +289,7 @@ export default function EmployeesAccess({ data, onChange, onAvailability }) {
                       {data.tools.map((t) => {
                         const role = emp.roles?.[t.id] || NO_ACCESS;
                         return (
-                          <td key={t.id} className="center">
+                          <td key={t.id} className="center td--role">
                             <RoleSelect
                               inline
                               tool={t}
